@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StadiumPulse AI — GenAI Tournament Operations Copilot</title>
+<meta name="description" content="GenAI-powered smart stadium operations, transit, accessibility and workforce assistant for the 2026 FIFA World Cup." />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">⚽</span>
+    <div>
+      <h1>StadiumPulse AI</h1>
+      <p class="tagline">GenAI operations copilot for the 2026 FIFA World Cup</p>
+    </div>
+  </div>
+  <div class="a11y-controls" role="group" aria-label="Display preferences">
+    <button id="contrast-toggle" type="button" aria-pressed="false">High contrast</button>
+    <button id="font-decrease" type="button" aria-label="Decrease text size">A−</button>
+    <button id="font-increase" type="button" aria-label="Increase text size">A+</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="StadiumPulse sections">
+  <button role="tab" id="tab-dashboard" aria-controls="panel-dashboard" aria-selected="true" class="tab-btn active">Dashboard</button>
+  <button role="tab" id="tab-transit" aria-controls="panel-transit" aria-selected="false" class="tab-btn">Transit &amp; Wayfinding</button>
+  <button role="tab" id="tab-faq" aria-controls="panel-faq" aria-selected="false" class="tab-btn">Fan FAQ</button>
+  <button role="tab" id="tab-accessibility" aria-controls="panel-accessibility" aria-selected="false" class="tab-btn">Accessibility Demo</button>
+  <button role="tab" id="tab-ops" aria-controls="panel-ops" aria-selected="false" class="tab-btn">Ops Copilot (Staff)</button>
+  <button role="tab" id="tab-workforce" aria-controls="panel-workforce" aria-selected="false" class="tab-btn">Workforce (Staff)</button>
+</nav>
+
+<main id="main-content">
+
+  <section id="panel-dashboard" role="tabpanel" aria-labelledby="tab-dashboard" class="panel">
+    <h2>Live Operations Dashboard</h2>
+    <div id="alert-banner" class="alert-banner" role="alert" hidden></div>
+    <div class="grid">
+      <div class="card">
+        <h3>Gate crowd density</h3>
+        <ul id="gate-bars" class="gate-bars" aria-live="polite"></ul>
+      </div>
+      <div class="card">
+        <h3>Sustainability tip</h3>
+        <p id="sustainability-tip" aria-live="polite">Loading…</p>
+        <ul id="energy-zones" class="gate-bars" aria-live="polite"></ul>
+      </div>
+      <div class="card">
+        <h3>Workforce coverage</h3>
+        <p id="workforce-coverage" aria-live="polite">Loading…</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-transit" role="tabpanel" aria-labelledby="tab-transit" class="panel" hidden>
+    <h2>Fan Transit &amp; Navigation Assistant</h2>
+    <form id="transit-form">
+      <label for="transit-city">Host city</label>
+      <select id="transit-city" required></select>
+
+      <label for="transit-origin">Where are you coming from?</label>
+      <input id="transit-origin" type="text" maxlength="200" placeholder="e.g. Downtown, hotel near the airport" required />
+
+      <label for="transit-language">Response language</label>
+      <select id="transit-language">
+        <option>English</option><option>Spanish</option><option>French</option>
+        <option>Portuguese</option><option>Arabic</option><option>Hindi</option><option>Mandarin</option>
+      </select>
+
+      <button type="submit">Get route</button>
+    </form>
+    <div id="transit-result" class="result-box" aria-live="polite"></div>
+
+    <h3>In-venue wayfinding</h3>
+    <form id="wayfind-form">
+      <label for="wayfind-section">Your seating section</label>
+      <input id="wayfind-section" type="text" maxlength="20" placeholder="e.g. 101, or North" required />
+
+      <label for="wayfind-amenity">Take me to</label>
+      <select id="wayfind-amenity">
+        <option value="gate">Nearest gate</option>
+        <option value="restroom">Nearest restroom</option>
+        <option value="concession">Nearest concessions</option>
+        <option value="accessible_entrance">Nearest accessible entrance</option>
+      </select>
+
+      <button type="submit">Get directions</button>
+    </form>
+    <div id="wayfind-result" class="result-box" aria-live="polite"></div>
+  </section>
+
+  <section id="panel-faq" role="tabpanel" aria-labelledby="tab-faq" class="panel" hidden>
+    <h2>Multilingual Fan FAQ</h2>
+    <p>Common fan-services questions, answered from a fixed set of facts in your language.</p>
+    <label for="faq-language">Language</label>
+    <select id="faq-language">
+      <option>English</option><option>Spanish</option><option>French</option>
+      <option>Portuguese</option><option>Arabic</option><option>Hindi</option><option>Mandarin</option>
+    </select>
+    <ul id="faq-topics" class="event-list"></ul>
+    <div id="faq-result" class="result-box" aria-live="polite"></div>
+  </section>
+
+  <section id="panel-accessibility" role="tabpanel" aria-labelledby="tab-accessibility" class="panel" hidden>
+    <h2>Generative Audio Description</h2>
+    <p>Select a match moment to hear an AI-generated audio description, designed for blind and low-vision fans.</p>
+    <div class="controls-row">
+      <label for="access-language">Language</label>
+      <select id="access-language">
+        <option>English</option><option>Spanish</option><option>French</option>
+        <option>Portuguese</option><option>Arabic</option><option>Hindi</option><option>Mandarin</option>
+      </select>
+      <label for="access-verbosity">Detail level</label>
+      <select id="access-verbosity">
+        <option value="rich">Rich</option>
+        <option value="brief">Brief</option>
+      </select>
+    </div>
+    <ul id="event-list" class="event-list"></ul>
+    <div id="commentary-result" class="result-box" aria-live="polite"></div>
+  </section>
+
+  <section id="panel-ops" role="tabpanel" aria-labelledby="tab-ops" class="panel" hidden>
+    <h2>Cognitive Operations Center</h2>
+    <p>Staff-only. Ask a natural-language question; the copilot grounds its answer in live sensor
+       readings and the stadium's standard operating procedures.</p>
+    <label for="ops-key">Staff API key</label>
+    <input id="ops-key" type="password" autocomplete="off" placeholder="X-API-Key" />
+    
+    <p class="helper-text">
+      Demo Staff API Key: <code>DEMO-OPS-KEY-2026</code>
+    </p>
+
+    <form id="ops-form">
+      <label for="ops-question">Question</label>
+      <textarea id="ops-question" maxlength="500" required placeholder="Crowd density is spiking at the North Gate. What is the cause and mitigation?"></textarea>
+      <button type="submit">Ask copilot</button>
+    </form>
+    <div id="ops-result" class="result-box" aria-live="polite"></div>
+  </section>
+
+
+  <section id="panel-workforce" role="tabpanel" aria-labelledby="tab-workforce" class="panel" hidden>
+    <h2>Evolutionary Workforce Scheduler</h2>
+    <p>Staff-only. Runs a genetic algorithm across volunteers, skills, languages and shift fairness constraints.</p>
+    <label for="workforce-key">Staff API key</label>
+    <input id="workforce-key" type="password" autocomplete="off" placeholder="X-API-Key" />
+
+    <p class="helper-text">
+      Demo Staff API Key: <code>DEMO-OPS-KEY-2026</code>
+    </p>
+
+    <button id="optimize-btn" type="button">Run optimization</button>
+    <div id="optimize-result" class="result-box" aria-live="polite"></div>
+
+    <form id="briefing-form">
+      <label for="volunteer-id">Volunteer ID (e.g. vol-00)</label>
+      <input id="volunteer-id" type="text" maxlength="20" placeholder="vol-00" required />
+      <button type="submit">Draft briefing message</button>
+    </form>
+    <div id="briefing-result" class="result-box" aria-live="polite"></div>
+  </section>
+
+</main>
+
+<footer class="app-footer">
+  <p>Built for the 2026 FIFA World Cup Smart Stadiums &amp; Tournament Operations challenge.</p>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>
