@@ -12,6 +12,7 @@ from .config import get_settings
 from .llm import build_llm_client
 from .logging_config import configure_logging
 from .rag.loader import load_knowledge_base
+from .rag.store import VectorStore
 from .routers import accessibility, dashboard, multilingual, navigation, ops, sustainability, transit, workforce
 from .sensors.simulator import SensorSimulator
 from .workforce.demo_data import build_demo_workforce
@@ -23,25 +24,39 @@ logger = logging.getLogger("stadiumpulse")
 configure_logging()
 
 
-async def _warm_up_workforce(application: FastAPI) -> None:
-    volunteers, shifts = build_demo_workforce()
-    loop = asyncio.get_running_loop()
-    initial_result = await loop.run_in_executor(None, lambda: WorkforceGA(volunteers, shifts, seed=42).run())
-    application.state.workforce_cache = {"volunteers": volunteers, "shifts": shifts, "result": initial_result}
-    logger.info("Workforce GA warm-up complete")
+async def _warm_up(application: FastAPI) -> None:
+    try:
+        application.state.store = await load_knowledge_base(application.state.llm)
+        logger.info("Knowledge base loaded")
+    except Exception:
+        logger.exception("Knowledge base loading failed, using empty store")
+        application.state.store = VectorStore()
+
+    try:
+        volunteers, shifts = build_demo_workforce()
+        loop = asyncio.get_running_loop()
+        initial_result = await loop.run_in_executor(
+            None, lambda: WorkforceGA(volunteers, shifts, seed=42).run(),
+        )
+        application.state.workforce_cache = {
+            "volunteers": volunteers, "shifts": shifts, "result": initial_result,
+        }
+        logger.info("Workforce GA warm-up complete")
+    except Exception:
+        logger.exception("Workforce warm-up failed")
 
 
 @asynccontextmanager
 async def lifespan(application: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
     application.state.llm = build_llm_client(settings)
-    application.state.store = await load_knowledge_base(application.state.llm)
+    application.state.store = VectorStore()
     application.state.sensors = SensorSimulator()
 
     volunteers, shifts = build_demo_workforce()
     application.state.workforce_cache = {"volunteers": volunteers, "shifts": shifts, "result": None}
 
-    warmup_task = asyncio.create_task(_warm_up_workforce(application))
+    warmup_task = asyncio.create_task(_warm_up(application))
 
     yield
 
